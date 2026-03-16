@@ -8,11 +8,24 @@ const gold = '#c9a84c'
 const border = '#1e1a10'
 const muted = '#5a4f35'
 
+const Field = ({ label, field, placeholder, type = 'text', hint, value, onChange }) => (
+  <div style={{ marginBottom: 18 }}>
+    <label style={{ display: 'block', fontSize: 11, color: gold, marginBottom: 7, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{label}</label>
+    <input type={type} value={value} onChange={e => onChange(field, e.target.value)} placeholder={placeholder}
+      style={{ width: '100%', padding: '11px 14px', background: '#0a0907', border: `1px solid ${border}`, borderRadius: 7, color: '#e8dfc8', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
+      onFocus={e => e.target.style.borderColor = gold} onBlur={e => e.target.style.borderColor = border}
+    />
+    {hint && <div style={{ fontSize: 11, color: muted, marginTop: 5 }}>{hint}</div>}
+  </div>
+)
+
 export default function Registro() {
   const [form, setForm] = useState({ nombre: '', email: '', telefono: '', refCode: '' })
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
   const router = useRouter()
+
+  const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }))
 
   const handleSubmit = async () => {
     if (!form.nombre.trim() || !form.email.trim()) return setToast({ msg: 'Nombre y email son requeridos', type: 'err' })
@@ -27,17 +40,6 @@ export default function Registro() {
     setLoading(false)
   }
 
-  const Field = ({ label, field, placeholder, type = 'text', hint }) => (
-    <div style={{ marginBottom: 18 }}>
-      <label style={{ display: 'block', fontSize: 11, color: gold, marginBottom: 7, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{label}</label>
-      <input type={type} value={form[field]} onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} placeholder={placeholder}
-        style={{ width: '100%', padding: '11px 14px', background: '#0a0907', border: `1px solid ${border}`, borderRadius: 7, color: '#e8dfc8', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
-        onFocus={e => e.target.style.borderColor = gold} onBlur={e => e.target.style.borderColor = border}
-      />
-      {hint && <div style={{ fontSize: 11, color: muted, marginTop: 5 }}>{hint}</div>}
-    </div>
-  )
-
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', fontFamily: 'Georgia, serif' }}>
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
@@ -46,11 +48,11 @@ export default function Registro() {
       <p style={{ color: muted, fontSize: 13, marginBottom: 28 }}>Se registra el corte de hoy y comienza a acumular puntos automáticamente.</p>
 
       <div style={{ background: '#111009', border: `1px solid ${border}`, borderRadius: 14, padding: 28, marginBottom: 20 }}>
-        <Field label="Nombre completo" field="nombre" placeholder="Ej: Carlos Méndez" />
-        <Field label="Email" field="email" type="email" placeholder="Ej: carlos@email.com" />
-        <Field label="Teléfono (opcional)" field="telefono" placeholder="Ej: 502-5555-1234" />
+        <Field label="Nombre completo" field="nombre" placeholder="Ej: Carlos Méndez" value={form.nombre} onChange={handleChange} />
+        <Field label="Email" field="email" type="email" placeholder="Ej: carlos@email.com" value={form.email} onChange={handleChange} />
+        <Field label="Teléfono (opcional)" field="telefono" placeholder="Ej: 502-5555-1234" value={form.telefono} onChange={handleChange} />
         <Field label="Código de referido (opcional)" field="refCode" placeholder="Ej: CARLOS-A3X"
-          hint="Si fue referido por otro cliente, ingresar su código" />
+          hint="Si fue referido por otro cliente, ingresar su código" value={form.refCode} onChange={handleChange} />
 
         {form.refCode.trim() && (
           <div style={{ background: '#052e16', border: '1px solid #166534', borderRadius: 8, padding: '11px 14px', marginBottom: 18, fontSize: 13, color: '#4ade80' }}>
@@ -68,7 +70,6 @@ export default function Registro() {
         </button>
       </div>
 
-      {/* Info recompensas */}
       <div style={{ background: '#111009', border: `1px solid ${border}`, borderRadius: 14, padding: 24 }}>
         <div style={{ fontSize: 12, color: gold, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>✦ Sistema de puntos y recompensas</div>
         {[
